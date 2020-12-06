@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MMA.Tools.RichModelGenerator.DesktopApp", "MMA.Tools.RichModelGenerator.DesktopApp\MMA.Tools.RichModelGenerator.DesktopApp.csproj", "{79A38A1A-9E72-4CDC-8F3B-16019012820A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{79A38A1A-9E72-4CDC-8F3B-16019012820A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79A38A1A-9E72-4CDC-8F3B-16019012820A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79A38A1A-9E72-4CDC-8F3B-16019012820A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79A38A1A-9E72-4CDC-8F3B-16019012820A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EE9B8CA0-217E-4D7D-8914-38955888A248}
+	EndGlobalSection
+EndGlobal
