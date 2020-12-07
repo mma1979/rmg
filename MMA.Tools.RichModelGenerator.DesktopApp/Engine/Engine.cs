@@ -12,8 +12,17 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
 {
     public class Engine
     {
-        public Engine()
+        public static void Start(List<TableDesigner> tablesSchemes, List<Relation> relations, string solutionName)
         {
+
+            var tables = GetTables(tablesSchemes, relations);
+
+            var entities = tables.Select(t => ClassGenerate(t, solutionName)).ToList();
+            var models = tables.Select(t => ModelsGenerate(t, solutionName)).ToList();
+            var validators = tables.Select(t => ValidatorGenerate(t, solutionName)).ToList();
+            var dbcontext = DbContextGenerate(tables);
+
+            SaveFiles(solutionName, entities, models, validators, dbcontext);
 
         }
 
@@ -34,49 +43,20 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
                 {
                     Name = r.Cells[0].Value.ToString(),
                     DataType = r.Cells[1].Value.ToString(),
-                    IsNullable = r.Cells[2].Selected
+                    IsNullable = r.Cells[2].Value != null && bool.Parse(r.Cells[2].Value.ToString())
                 }).ToList();
 
             var tables = tablesSchemes.Select(t => new Table
             {
                 Name = t.Name,
                 Columns = tableColumns(t.Rows),
-                TableRelations = tableRelations(t.Name)
+                TableRelations = relations.Any()?tableRelations(t.Name): new List<TableRelation>()
             }).ToList();
 
             return tables;
         }
-        public static void Start(List<TableDesigner> tablesSchemes, List<Relation> relations, string solutionName)
-        {
 
-            var tables = GetTables(tablesSchemes, relations);
-
-            var entities = tables.Select(t => ClassGenerate(t, solutionName)).ToList();
-            var models = tables.Select(t => ModelsGenerate(t, solutionName)).ToList();
-            var validators = tables.Select(t => ValidatorGenerate(t, solutionName)).ToList();
-            var dbcontext = DbContextGenerate(tables);
-
-            SaveFiles(solutionName, entities, models, validators, dbcontext);
-
-        }
-
-        private static string DbContextGenerate(List<Table> tables)
-        {
-            var codes = tables.Select(t => TableDbContext(t)).ToList();
-            StringBuilder res = new StringBuilder("// Put on ApplicationDbContext\n\n");
-            StringBuilder configs = new StringBuilder("// Put on OnModelCreating\n\n");
-            codes.ForEach(t =>
-            {
-                res.Append(t.Item1);
-                res.Append("\n");
-                configs.Append(t.Item2);
-                configs.Append("\n");
-            });
-
-            res.Append("\n\n//===========================================");
-            res.Append(configs.ToString());
-            return res.ToString();
-        }
+       
 
         private static void SaveFiles(string solutionName, List<FileModel> entities, List<FileModel> models, List<FileModel> validators, string dbcontext)
         {
@@ -198,6 +178,23 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             configBuilder.Replace("@RelationsConfig@", string.Join("\n", buildRelationsConfig(table.TableRelations)));
 
             return (builder.ToString(), configBuilder.ToString());
+        }
+        private static string DbContextGenerate(List<Table> tables)
+        {
+            var codes = tables.Select(t => TableDbContext(t)).ToList();
+            StringBuilder res = new StringBuilder("// Put on ApplicationDbContext\n\n");
+            StringBuilder configs = new StringBuilder("// Put on OnModelCreating\n\n");
+            codes.ForEach(t =>
+            {
+                res.Append(t.Item1);
+                res.Append("\n");
+                configs.Append(t.Item2);
+                configs.Append("\n");
+            });
+
+            res.Append("\n\n//===========================================");
+            res.Append(configs.ToString());
+            return res.ToString();
         }
 
         private static string BuildNavigationProps(Table table)

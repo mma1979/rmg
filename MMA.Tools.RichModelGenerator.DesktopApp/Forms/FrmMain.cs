@@ -121,7 +121,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
 
             var result = dialog.ShowDialog();
 
-            if(result == DialogResult.OK)
+            if (result == DialogResult.OK)
             {
                 var model = new ExportImportModel
                 {
@@ -160,19 +160,41 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
                 using var reader = new StreamReader(dialog.FileName);
                 var model = JsonConvert.DeserializeObject<ExportImportModel>(reader.ReadToEnd());
 
-                var _tables = model.Tables.Select(t => new TableDesigner(t.Name)
+                var columns = Screen.PrimaryScreen.WorkingArea.Width / 300;
+                var rows = Screen.PrimaryScreen.WorkingArea.Width / 300;
+
+                var ts = new List<TableDesigner>();
+                var _tables = model.Tables.Select((t, i) =>
                 {
-                    DataSource = t.Columns
+
+                    var c = i % columns;
+                    var r = i / rows;
+
+
+                    var x = c * 310;
+                    var y = r * 235 + 35;
+
+                    
+                    var panel = new PanelDesigner(t.Name, x, y);
+                    t.Columns.ForEach(c =>
+                    {
+                        panel.table.Rows.Add(c.Name, c.DataType, c.IsNullable);
+                    });
+
+                    ts.Add(panel.table);
+                    return panel;
+
                 }).ToList();
 
-                tables = _tables;
+                tables = ts;
+
                 Controls.AddRange(_tables.ToArray());
 
                 Relations = model.Relations;
 
             }
 
-           
+
         }
     }
 }

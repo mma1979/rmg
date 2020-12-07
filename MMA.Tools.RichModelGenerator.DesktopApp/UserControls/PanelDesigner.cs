@@ -9,7 +9,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
 {
     public class PanelDesigner : Panel
     {
-        private TableDesigner table;
+        public TableDesigner table;
         private Label lblName;
 
 
