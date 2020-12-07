@@ -54,17 +54,35 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             var entities = tables.Select(t => ClassGenerate(t, solutionName)).ToList();
             var models = tables.Select(t => ModelsGenerate(t, solutionName)).ToList();
             var validators = tables.Select(t => ValidatorGenerate(t, solutionName)).ToList();
-            var dbcontext = tables.Select(t => DbContextGenerate(t)).ToList();
+            var dbcontext = DbContextGenerate(tables);
 
             SaveFiles(solutionName, entities, models, validators, dbcontext);
 
         }
 
-        private static void SaveFiles(string solutionName, List<FileModel> entities, List<FileModel> models, List<FileModel> validators, List<string> dbcontext)
+        private static string DbContextGenerate(List<Table> tables)
+        {
+            var codes = tables.Select(t => TableDbContext(t)).ToList();
+            StringBuilder res = new StringBuilder("// Put on ApplicationDbContext\n\n");
+            StringBuilder configs = new StringBuilder("// Put on OnModelCreating\n\n");
+            codes.ForEach(t =>
+            {
+                res.Append(t.Item1);
+                res.Append("\n");
+                configs.Append(t.Item2);
+                configs.Append("\n");
+            });
+
+            res.Append("\n\n//===========================================");
+            res.Append(configs.ToString());
+            return res.ToString();
+        }
+
+        private static void SaveFiles(string solutionName, List<FileModel> entities, List<FileModel> models, List<FileModel> validators, string dbcontext)
         {
             var dialog = new FolderBrowserDialog
             {
-                Description = "Select folder to save fies",
+                Description = "Select folder to save files",
                 RootFolder = Environment.SpecialFolder.Desktop,
                 ShowNewFolderButton = true
             };
@@ -103,8 +121,8 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
 
 
 
-            using var writer = new StreamWriter($"{dialog.SelectedPath}\\{solutionName}\\ApplicationDbContex.txt");
-            writer.Write(string.Join("\n\n==========================\n\n", dbcontext));
+            using var writer = new StreamWriter($"{dialog.SelectedPath}\\{solutionName}\\ApplicationDbContex.cs");
+            writer.Write(dbcontext);
 
             Process.Start("explorer.exe", $"{dialog.SelectedPath}\\{solutionName}");
         }
@@ -159,7 +177,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             };
         }
 
-        private static string DbContextGenerate(Table table)
+        private static (string,string) TableDbContext(Table table)
         {
             string relationsConfig(TableRelation r) =>
                 Templates.RELATION_CONFIG_TEMPLATE
@@ -172,12 +190,14 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
                 .Select(r => relationsConfig(r))
                 .ToList();
 
-            StringBuilder builder = new StringBuilder(Templates.DBCONTEXT_TEMPLATE);
+            StringBuilder builder = new StringBuilder(Templates.DBCONTEXT_SET_TEMPLATE);
             builder.Replace("@ClassName@", table.Name)
-                .Replace("@ClassNames@", table.SetName)
-                .Replace("@RelationsConfig@", string.Join("\n", buildRelationsConfig(table.TableRelations)));
+                .Replace("@ClassNames@", table.SetName);
 
-            return builder.ToString();
+            StringBuilder configBuilder = new StringBuilder(Templates.DBCONTEXT_OnModelCreating_TEMPLATE);
+            configBuilder.Replace("@RelationsConfig@", string.Join("\n", buildRelationsConfig(table.TableRelations)));
+
+            return (builder.ToString(), configBuilder.ToString());
         }
 
         private static string BuildNavigationProps(Table table)

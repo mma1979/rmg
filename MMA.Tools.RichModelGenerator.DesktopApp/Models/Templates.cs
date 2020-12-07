@@ -100,6 +100,7 @@ namespace @SolutionName@.Core.Models
 {
     public class @ClassName@ReadModel
     {
+        public long Id {get; set;}
         @Props@
         @ForeignKeys@
       
@@ -107,7 +108,7 @@ namespace @SolutionName@.Core.Models
     }
     public class @ClassName@ModifyModel
     {
-
+        public long Id {get; set;}
         @Props@
       
         @NavigationProps@
@@ -136,11 +137,10 @@ namespace @SolutionName@.Core.Validations
 }
 
 ";
-        public const string DBCONTEXT_TEMPLATE = @"
-// Put on ApplicationDbContext
-public virtual DbSet<@ClassName@> @ClassNames@ { get; set; }
+        public const string DBCONTEXT_SET_TEMPLATE = @"
+public virtual DbSet<@ClassName@> @ClassNames@ { get; set; }";
+        public const string DBCONTEXT_OnModelCreating_TEMPLATE = @"
 
-// Put on OnModelCreating
 modelBuilder.Entity<@ClassName@>(entity =>
             {
                 entity.HasQueryFilter(e => e.IsActive != false);
