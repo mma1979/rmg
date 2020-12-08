@@ -55,8 +55,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
 
             return tables;
         }
-
-       
+               
 
         private static void SaveFiles(string solutionName, List<FileModel> entities, List<FileModel> models, List<FileModel> validators, string dbcontext)
         {
