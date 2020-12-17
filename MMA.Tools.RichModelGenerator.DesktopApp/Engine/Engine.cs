@@ -20,9 +20,10 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             var entities = tables.Select(t => ClassGenerate(t, solutionName)).ToList();
             var models = tables.Select(t => ModelsGenerate(t, solutionName)).ToList();
             var validators = tables.Select(t => ValidatorGenerate(t, solutionName)).ToList();
+            var configurations = tables.Select(t => EntityConfigurationGenerate(t, solutionName)).ToList();
             var dbcontext = DbContextGenerate(tables);
 
-            SaveFiles(solutionName, entities, models, validators, dbcontext);
+            SaveFiles(solutionName, entities, models, validators, configurations, dbcontext);
 
         }
 
@@ -57,7 +58,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
         }
                
 
-        private static void SaveFiles(string solutionName, List<FileModel> entities, List<FileModel> models, List<FileModel> validators, string dbcontext)
+        private static void SaveFiles(string solutionName, List<FileModel> entities, List<FileModel> models, List<FileModel> validators,List<FileModel> configurations, string dbcontext)
         {
             var dialog = new FolderBrowserDialog
             {
@@ -97,6 +98,14 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
                 writer.Write(f.Contents);
             }
             validators.ForEach(f => saveValidators(f));
+
+            void saveConfigurations(FileModel f)
+            {
+
+                using var writer = new StreamWriter($"{dialog.SelectedPath}\\{solutionName}\\EntityFramworkCore\\EntityConfigurations\\{ f.FileName}.cs");
+                writer.Write(f.Contents);
+            }
+            configurations.ForEach(f => saveConfigurations(f));
 
 
 
@@ -155,8 +164,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
                 Contents = builder.ToString()
             };
         }
-
-        private static (string,string) TableDbContext(Table table)
+        private static FileModel EntityConfigurationGenerate(Table table, string solutionName)
         {
             string relationsConfig(TableRelation r) =>
                 Templates.RELATION_CONFIG_TEMPLATE
@@ -169,12 +177,28 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
                 .Select(r => relationsConfig(r))
                 .ToList();
 
+            StringBuilder builder = new StringBuilder(Templates.ENTITY_CONFIGURATIONS_TEMPLATE);
+            builder.Replace("@SolutionName@", solutionName)
+                .Replace("@ClassName@", table.Name)
+                 .Replace("@ClassNames@", table.SetName)
+                .Replace("@RelationsConfig@", string.Join("\n", buildRelationsConfig(table.TableRelations))); ;
+
+            return new FileModel
+            {
+                FileName = $"{table.Name}EntityConfiguration",
+                Contents = builder.ToString()
+            };
+        }
+
+        private static (string,string) TableDbContext(Table table)
+        {
+           
             StringBuilder builder = new StringBuilder(Templates.DBCONTEXT_SET_TEMPLATE);
             builder.Replace("@ClassName@", table.Name)
                 .Replace("@ClassNames@", table.SetName);
 
             StringBuilder configBuilder = new StringBuilder(Templates.DBCONTEXT_OnModelCreating_TEMPLATE);
-            configBuilder.Replace("@RelationsConfig@", string.Join("\n", buildRelationsConfig(table.TableRelations)));
+            configBuilder.Replace("@ClassName@", table.Name);
 
             return (builder.ToString(), configBuilder.ToString());
         }
@@ -298,6 +322,11 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             if (!Directory.Exists($"{root}\\{solutionName}\\Databae\\Tables"))
             {
                 Directory.CreateDirectory($"{root}\\{solutionName}\\Databae\\Tables");
+            }
+
+            if (!Directory.Exists($"{root}\\{solutionName}\\EntityFramworkCore\\EntityConfigurations"))
+            {
+                Directory.CreateDirectory($"{root}\\{solutionName}\\EntityFramworkCore\\EntityConfigurations");
             }
         }
     }

@@ -139,17 +139,18 @@ namespace @SolutionName@.Core.Validations
 ";
         public const string DBCONTEXT_SET_TEMPLATE = @"
 public virtual DbSet<@ClassName@> @ClassNames@ { get; set; }";
-        public const string DBCONTEXT_OnModelCreating_TEMPLATE = @"
+        //        public const string DBCONTEXT_OnModelCreating_TEMPLATE = @"
 
-modelBuilder.Entity<@ClassName@>(entity =>
-            {
-                entity.HasQueryFilter(e => e.IsActive != false);
-                entity.Property(e => e.IsActive).HasDefaultValueSql(""((1))"");
-                entity.Property(e => e.CreatedDate).HasDefaultValueSql(""(getdate())"");
-                @RelationsConfig@
+        //modelBuilder.Entity<@ClassName@>(entity =>
+        //            {
+        //                entity.HasQueryFilter(e => e.IsActive != false);
+        //                entity.Property(e => e.IsActive).HasDefaultValueSql(""((1))"");
+        //                entity.Property(e => e.CreatedDate).HasDefaultValueSql(""(getdate())"");
+        //                @RelationsConfig@
 
-    });
-";
+        //    });
+        //";
+        public const string DBCONTEXT_OnModelCreating_TEMPLATE = @"modelBuilder.ApplyConfiguration(new  @ClassName@EntityConfiguration());";
         public const string RELATION_CONFIG_TEMPLATE = @"
  entity.HasMany(e => e.@Children@).WithOne(e => e.@Parent@).HasForeignKey(e => e.@ForeignKey@).OnDelete(DeleteBehavior.Cascade);
 ";
@@ -210,5 +211,37 @@ modelBuilder.Entity<@ClassName@>(entity =>
         return this;
     }
 ";
+        public const string ENTITY_CONFIGURATIONS_TEMPLATE = @"using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using @SolutionName@.Common;
+using @SolutionName@.Core.Database.Identity;
+using @SolutionName@.Core.Models;
+using @SolutionName@.Core.Validations;
+using @SolutionName@.Core.Database.Tables;
+
+namespace @SolutionName@.EntityFramworkCore.EntityConfigurations
+{
+    public class @ClassName@EntityConfiguration : IEntityTypeConfiguration<@ClassName@>
+    {
+        private readonly string _schema;
+
+        public @ClassName@EntityConfiguration(string schema=""dbo"")
+        {
+            _schema = schema;
+        }
+    public void Configure(EntityTypeBuilder<@ClassName@> modelBuilder)
+    {
+        if (!string.IsNullOrWhiteSpace(_schema))
+            modelBuilder.ToTable(""@ClassNames@"", _schema);
+        modelBuilder.HasKey(e => e.Id);
+        //modelBuilder.Property(e => e.Id).ValueGeneratedNever();
+
+         entity.HasQueryFilter(e => e.IsActive != false);
+        entity.Property(e => e.IsActive).HasDefaultValueSql(""((1))"");
+        entity.Property(e => e.CreatedDate).HasDefaultValueSql(""(getdate())"");
+        @RelationsConfig@
+        }
+}
+}";
     }
 }
