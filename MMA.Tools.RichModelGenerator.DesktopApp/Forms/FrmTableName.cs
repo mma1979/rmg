@@ -23,6 +23,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             FrmMain frm = Application.OpenForms["FrmMain"] as FrmMain;
             frm.OK = true;
             frm.TableName = txtName.Text;
+            frm.IdType = comIdType.Text;
             Close();
         }
 

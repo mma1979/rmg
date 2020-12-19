@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace MMA.Tools.RichModelGenerator.DesktopApp
+namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
 {
     public class Engine
     {
@@ -21,10 +21,13 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             var models = tables.Select(t => ModelsGenerate(t, solutionName)).ToList();
             var validators = tables.Select(t => ValidatorGenerate(t, solutionName)).ToList();
             var dbcontext = DbContextGenerate(tables);
+            var mapping = AutoMapperGenerate(tables);
 
-            SaveFiles(solutionName, entities, models, validators, dbcontext);
+            SaveFiles(solutionName, entities, models, validators, dbcontext, mapping);
 
         }
+
+       
 
         public static List<Table> GetTables(List<TableDesigner> tablesSchemes, List<Relation> relations)
         {
@@ -49,6 +52,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             var tables = tablesSchemes.Select(t => new Table
             {
                 Name = t.Name,
+                IdType = t.IdType,
                 Columns = tableColumns(t.Rows),
                 TableRelations = relations.Any()?tableRelations(t.Name): new List<TableRelation>()
             }).ToList();
@@ -57,7 +61,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
         }
                
 
-        private static void SaveFiles(string solutionName, List<FileModel> entities, List<FileModel> models, List<FileModel> validators, string dbcontext)
+        private static void SaveFiles(string solutionName, List<FileModel> entities, List<FileModel> models, List<FileModel> validators, string dbcontext, string mapping)
         {
             var dialog = new FolderBrowserDialog
             {
@@ -100,8 +104,11 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
 
 
 
-            using var writer = new StreamWriter($"{dialog.SelectedPath}\\{solutionName}\\ApplicationDbContex.cs");
-            writer.Write(dbcontext);
+            using var contextWriter = new StreamWriter($"{dialog.SelectedPath}\\{solutionName}\\ApplicationDbContex.cs");
+            contextWriter.Write(dbcontext);
+
+            using var mappingWriter = new StreamWriter($"{dialog.SelectedPath}\\{solutionName}\\Services\\Mapping\\MappingProfile.cs");
+            mappingWriter.Write(mapping);
 
             Process.Start("explorer.exe", $"{dialog.SelectedPath}\\{solutionName}");
         }
@@ -111,6 +118,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             StringBuilder builder = new StringBuilder(Templates.CLASS_TEMPLATE);
             builder.Replace("@SolutionName@", solutionName)
                 .Replace("@ClassName@", table.Name)
+                .Replace("@TID@", string.IsNullOrEmpty(table.IdType)?"long":table.IdType)
                 .Replace("@ValidatorType@", $"{table.Name}Validator")
                 .Replace("@PrivateConst@", BuildPrivateConst(table))
                 .Replace("@PublicConst@", BuildPublicConst(table))
@@ -132,6 +140,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             StringBuilder builder = new StringBuilder(Templates.MODELS_TEMPLATE);
             builder.Replace("@SolutionName@", solutionName)
                 .Replace("@ClassName@", table.Name)
+                .Replace("@TID@", string.IsNullOrEmpty(table.IdType) ? "long" : table.IdType)
                 .Replace("@Props@", BuildProps(table, false))
                 .Replace("@NavigationProps@", BuildModelsNavigationProps(table))
                 .Replace("@ForeignKeys@", BuildForeignKeys(table, false));
@@ -174,7 +183,9 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
                 .Replace("@ClassNames@", table.SetName);
 
             StringBuilder configBuilder = new StringBuilder(Templates.DBCONTEXT_OnModelCreating_TEMPLATE);
-            configBuilder.Replace("@RelationsConfig@", string.Join("\n", buildRelationsConfig(table.TableRelations)));
+            configBuilder
+                .Replace("@ClassName@", table.Name)
+                .Replace("@RelationsConfig@", string.Join("\n", buildRelationsConfig(table.TableRelations)));
 
             return (builder.ToString(), configBuilder.ToString());
         }
@@ -196,6 +207,14 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             return res.ToString();
         }
 
+        private static string AutoMapperGenerate(List<Table> tables)
+        {
+            var list = tables
+                .Select(table => Templates.AUTO_MAPPER_TEMPLATE.Replace("@ClassName@", table.Name))
+                .ToList();
+
+            return string.Join("\n\n", list);
+        }
         private static string BuildNavigationProps(Table table)
         {
             string collectionProp(TableRelation r) => $"public virtual ICollection<{r.RelatedTableName}> {r.SetRelatedTableName} {{ get; private set; }}";
@@ -274,7 +293,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             var modifier = isPrivateSet ? "private " : "";
             var keys = table.TableRelations
                 .Where(r => !r.IsCollection)
-                .Select(r => $"public long {r.ForeignKey} {{get; {modifier}set;}}");
+                .Select(r => $"public {(string.IsNullOrEmpty(table.IdType) ? "long" : table.IdType)} {r.ForeignKey} {{get; {modifier}set;}}");
             return string.Join("\n", keys);
         }
 
@@ -298,6 +317,11 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             if (!Directory.Exists($"{root}\\{solutionName}\\Databae\\Tables"))
             {
                 Directory.CreateDirectory($"{root}\\{solutionName}\\Databae\\Tables");
+            }
+
+            if (!Directory.Exists($"{root}\\{solutionName}\\Services\\Mapping"))
+            {
+                Directory.CreateDirectory($"{root}\\{solutionName}\\Services\\Mapping");
             }
         }
     }

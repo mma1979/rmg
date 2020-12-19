@@ -69,12 +69,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Engine\Engine.cs" />
+    <Compile Include="Engines\DatabaseEngine.cs" />
+    <Compile Include="Engines\Engine.cs" />
     <Compile Include="Forms\FrmAboutBox.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\FrmAboutBox.Designer.cs">
       <DependentUpon>FrmAboutBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FrmDbExport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FrmDbExport.Designer.cs">
+      <DependentUpon>FrmDbExport.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FrmKeys.cs">
       <SubType>Form</SubType>
@@ -88,6 +95,7 @@
     <Compile Include="Forms\FrmSave.Designer.cs">
       <DependentUpon>FrmSave.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\DatabaseScheme.cs" />
     <Compile Include="Models\EngineModels.cs" />
     <Compile Include="Forms\FrmMain.cs">
       <SubType>Form</SubType>
@@ -121,6 +129,9 @@
     <Compile Include="Models\Templates.cs" />
     <EmbeddedResource Include="Forms\FrmAboutBox.resx">
       <DependentUpon>FrmAboutBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FrmDbExport.resx">
+      <DependentUpon>FrmDbExport.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FrmKeys.resx">
       <DependentUpon>FrmKeys.cs</DependentUpon>

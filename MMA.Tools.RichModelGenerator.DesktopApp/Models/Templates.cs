@@ -22,7 +22,7 @@ using System.Text;
 
 namespace @SolutionName@.Core.Database.Tables
 {
-    public class @ClassName@:BaseEntity<long>
+    public class @ClassName@:BaseEntity<@TID@>
     {
         @NavigationProps@
         @ForeignKeys@
@@ -100,7 +100,7 @@ namespace @SolutionName@.Core.Models
 {
     public class @ClassName@ReadModel
     {
-        public long Id {get; set;}
+        public @TID@ Id {get; set;}
         @Props@
         @ForeignKeys@
       
@@ -108,7 +108,7 @@ namespace @SolutionName@.Core.Models
     }
     public class @ClassName@ModifyModel
     {
-        public long Id {get; set;}
+        public @TID@ Id {get; set;}
         @Props@
       
         @NavigationProps@
@@ -209,6 +209,9 @@ modelBuilder.Entity<@ClassName@>(entity =>
 
         return this;
     }
+";
+        public const string AUTO_MAPPER_TEMPLATE = @" CreateMap<@ClassName@, @ClassName@ReadModel>().IgnoreAllPropertiesWithAnInaccessibleSetter().IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
+            CreateMap<@ClassName@, @ClassName@ModifyModel>().IgnoreAllPropertiesWithAnInaccessibleSetter().IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
 ";
     }
 }

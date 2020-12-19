@@ -20,6 +20,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
                         $"{Name}s";
             }
         }
+        public string IdType { get; set; }
 
         public List<Column> Columns { get; set; }
         public List<TableRelation> TableRelations { get; set; }

@@ -1,4 +1,5 @@
-﻿using MMA.Tools.RichModelGenerator.DesktopApp.Forms;
+﻿using MMA.Tools.RichModelGenerator.DesktopApp.Engines;
+using MMA.Tools.RichModelGenerator.DesktopApp.Forms;
 using MMA.Tools.RichModelGenerator.DesktopApp.Models;
 using Newtonsoft.Json;
 using System;
@@ -22,6 +23,8 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
         }
         public bool OK { get; set; }
         public string TableName { get; set; }
+        public string IdType { get; set; }
+        public string ConnectionString { get; set; }
 
         public List<Relation> Relations { get; set; }
         public FrmMain()
@@ -58,7 +61,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             var y = r * 235 + 35;
 
 
-            var table = new PanelDesigner(TableName, x, y);
+            var table = new PanelDesigner(TableName, x, y, IdType);
             Controls.Add(table);
             Tables.Add(table.Controls[TableName] as TableDesigner);
 
@@ -71,6 +74,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             Relations = new List<Relation>();
             OK = false;
             TableName = string.Empty;
+            IdType = "long";
         }
 
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -163,7 +167,6 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
                 var columns = Screen.PrimaryScreen.WorkingArea.Width / 300;
                 var rows = Screen.PrimaryScreen.WorkingArea.Width / 300;
 
-                var ts = new List<TableDesigner>();
                 var _tables = model.Tables.Select((t, i) =>
                 {
 
@@ -174,19 +177,17 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
                     var x = c * 310;
                     var y = r * 235 + 35;
 
-                    
-                    var panel = new PanelDesigner(t.Name, x, y);
+
+                    var panel = new PanelDesigner(t.Name, x, y, t.IdType);
                     t.Columns.ForEach(c =>
                     {
                         panel.table.Rows.Add(c.Name, c.DataType, c.IsNullable);
                     });
 
-                    ts.Add(panel.table);
+                    tables.Add(panel.table);
                     return panel;
 
                 }).ToList();
-
-                tables = ts;
 
                 Controls.AddRange(_tables.ToArray());
 
@@ -195,6 +196,61 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             }
 
 
+        }
+
+        private void DbExportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var frm = new FrmDbExport();
+            var res = frm.ShowDialog();
+
+            if (string.IsNullOrEmpty(ConnectionString))
+            {
+                return;
+
+            }
+
+            Tables.ForEach(t => Controls.RemoveByKey(t.Name));
+            tables = new List<TableDesigner>();
+            Relations = new List<Relation>();
+            OK = false;
+            TableName = string.Empty;
+
+            var database = new DatabaseEngine(ConnectionString);
+            var tablesScheme = database.ReadTablesScheme();
+            var relationsScheme = database.ReadRelationsScheme();
+
+            var tablesList = tablesScheme.GroupBy(t => t.table_name)
+                .Select(t => database.GetTable(t.ToList(), relationsScheme))
+                .ToList();
+
+
+            var columns = Screen.PrimaryScreen.WorkingArea.Width / 300;
+            var rows = Screen.PrimaryScreen.WorkingArea.Width / 300;
+
+            var _tables = tablesList.Select((t, i) =>
+            {
+
+                var c = i % columns;
+                var r = i / rows;
+
+
+                var x = c * 310;
+                var y = r * 235 + 35;
+
+
+                var panel = new PanelDesigner(t.Name, x, y, t.IdType);
+                t.Columns.ForEach(c =>
+                {
+                    panel.table.Rows.Add(c.Name, c.DataType, c.IsNullable);
+                });
+
+                tables.Add(panel.table);
+                return panel;
+
+            }).ToList();
+
+            Controls.AddRange(_tables.ToArray());
+            Relations = database.GetRelations(relationsScheme);
         }
     }
 }

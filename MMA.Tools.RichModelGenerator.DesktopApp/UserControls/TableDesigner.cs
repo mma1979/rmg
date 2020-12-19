@@ -8,9 +8,11 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
         public DataGridViewTextBoxColumn ColumnName { get; set; }
         public DataGridViewComboBoxColumn DataType { get; set; }
         public DataGridViewCheckBoxColumn IsNullable { get; set; }
+        public string IdType { get; set; }
         
-        public TableDesigner(string name= "table1",int x= 31, int y= 35)
+        public TableDesigner(string name= "table1",int x= 31, int y= 35, string idType="long")
         {
+            IdType = idType;
             // 
             // ColumnName
             // 
@@ -32,9 +34,11 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             DataType.Items.AddRange(new string[] {
             "int",
             "long",
+            "decimal",
             "bool",
             "string",
-            "DateTime"});
+            "DateTime",
+            "Guid"});
 
             // 
             // ColumnName

@@ -12,14 +12,12 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
         public TableDesigner table;
         private Label lblName;
 
-
-        private void InitializeComponent(string name = "table1", int x = 31, int y = 35)
+        private void InitializeComponent(string name = "table1", int x = 31, int y = 35, string idType = "long")
         {
-            
-           
+
 
             lblName = new System.Windows.Forms.Label();
-            table = new TableDesigner(name, x, y);
+            table = new TableDesigner(name, x, y, idType);
             // 
             // lblName
             // 
@@ -44,9 +42,9 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             Controls.AddRange(new Control[] { lblName, table });
         }
 
-        public PanelDesigner(string name = "table1", int x = 31, int y = 35)
+        public PanelDesigner(string name = "table1", int x = 31, int y = 35, string idType = "long")
         {
-            InitializeComponent(name,x,y);
+            InitializeComponent(name,x,y,idType);
         }
     }
 }
