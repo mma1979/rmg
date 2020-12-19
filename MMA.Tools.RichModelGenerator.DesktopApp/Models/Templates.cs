@@ -79,7 +79,7 @@ namespace @SolutionName@.Core.Database.Tables
 
         public @ClassName@ Delete()
         {
-            IsActive = false;
+            IsDeleted = false;
             ModifiedDate = DateTime.UtcNow;
             return this;
         }
@@ -143,8 +143,8 @@ public virtual DbSet<@ClassName@> @ClassNames@ { get; set; }";
 
         //modelBuilder.Entity<@ClassName@>(entity =>
         //            {
-        //                entity.HasQueryFilter(e => e.IsActive != false);
-        //                entity.Property(e => e.IsActive).HasDefaultValueSql(""((1))"");
+        //                entity.HasQueryFilter(e => e.IsDeleted != false);
+        //                entity.Property(e => e.IsDeleted).HasDefaultValueSql(""((1))"");
         //                entity.Property(e => e.CreatedDate).HasDefaultValueSql(""(getdate())"");
         //                @RelationsConfig@
 
@@ -152,7 +152,7 @@ public virtual DbSet<@ClassName@> @ClassNames@ { get; set; }";
         //";
         public const string DBCONTEXT_OnModelCreating_TEMPLATE = @"modelBuilder.ApplyConfiguration(new  @ClassName@EntityConfiguration());";
         public const string RELATION_CONFIG_TEMPLATE = @"
- entity.HasMany(e => e.@Children@).WithOne(e => e.@Parent@).HasForeignKey(e => e.@ForeignKey@).OnDelete(DeleteBehavior.Cascade);
+ modelBuilder.HasMany(e => e.@Children@).WithOne(e => e.@Parent@).HasForeignKey(e => e.@ForeignKey@).OnDelete(DeleteBehavior.Cascade);
 ";
         public const string CHILED_FUNCTIONS_TEMPLATE = @"
     public @ClassName@ Add@RelatedName@(@RelatedName@ModifyModel model)
@@ -236,9 +236,9 @@ namespace @SolutionName@.EntityFramworkCore.EntityConfigurations
         modelBuilder.HasKey(e => e.Id);
         //modelBuilder.Property(e => e.Id).ValueGeneratedNever();
 
-         entity.HasQueryFilter(e => e.IsActive != false);
-        entity.Property(e => e.IsActive).HasDefaultValueSql(""((1))"");
-        entity.Property(e => e.CreatedDate).HasDefaultValueSql(""(getdate())"");
+         modelBuilder.HasQueryFilter(e => e.IsDeleted != true);
+        modelBuilder.Property(e => e.IsDeleted).HasDefaultValueSql(""((0))"");
+        modelBuilder.Property(e => e.CreatedDate).HasDefaultValueSql(""(getdate())"");
         @RelationsConfig@
         }
 }
