@@ -43,7 +43,7 @@
             this.label1.Location = new System.Drawing.Point(12, 20);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(88, 17);
-            this.label1.TabIndex = 0;
+            this.label1.TabIndex = 4;
             this.label1.Text = "Table Name: ";
             // 
             // txtName
@@ -51,7 +51,7 @@
             this.txtName.Location = new System.Drawing.Point(15, 40);
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(296, 24);
-            this.txtName.TabIndex = 1;
+            this.txtName.TabIndex = 0;
             this.txtName.TextChanged += new System.EventHandler(this.TxtName_TextChanged);
             // 
             // btnOK
@@ -81,7 +81,7 @@
             this.label2.Location = new System.Drawing.Point(334, 9);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(62, 17);
-            this.label2.TabIndex = 4;
+            this.label2.TabIndex = 5;
             this.label2.Text = "ID Type:";
             // 
             // comIdType
@@ -99,7 +99,7 @@
             this.comIdType.Location = new System.Drawing.Point(337, 40);
             this.comIdType.Name = "comIdType";
             this.comIdType.Size = new System.Drawing.Size(161, 24);
-            this.comIdType.TabIndex = 5;
+            this.comIdType.TabIndex = 1;
             this.comIdType.Text = "long";
             // 
             // FrmTableName

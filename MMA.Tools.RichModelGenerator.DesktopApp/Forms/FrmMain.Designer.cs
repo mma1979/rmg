@@ -35,6 +35,7 @@
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dbExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,7 +45,6 @@
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.shortcutsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dbExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -104,6 +104,14 @@
             this.exportToolStripMenuItem.Size = new System.Drawing.Size(291, 26);
             this.exportToolStripMenuItem.Text = "Exp&ort";
             this.exportToolStripMenuItem.Click += new System.EventHandler(this.ExportToolStripMenuItem_Click);
+            // 
+            // dbExportToolStripMenuItem
+            // 
+            this.dbExportToolStripMenuItem.Name = "dbExportToolStripMenuItem";
+            this.dbExportToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
+            this.dbExportToolStripMenuItem.Size = new System.Drawing.Size(291, 26);
+            this.dbExportToolStripMenuItem.Text = "Export from &Database";
+            this.dbExportToolStripMenuItem.Click += new System.EventHandler(this.DbExportToolStripMenuItem_Click);
             // 
             // importToolStripMenuItem
             // 
@@ -173,14 +181,6 @@
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.AboutToolStripMenuItem_Click);
-            // 
-            // dbExportToolStripMenuItem
-            // 
-            this.dbExportToolStripMenuItem.Name = "dbExportToolStripMenuItem";
-            this.dbExportToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-            this.dbExportToolStripMenuItem.Size = new System.Drawing.Size(291, 26);
-            this.dbExportToolStripMenuItem.Text = "Export from &Database";
-            this.dbExportToolStripMenuItem.Click += new System.EventHandler(this.DbExportToolStripMenuItem_Click);
             // 
             // FrmMain
             // 
