@@ -34,9 +34,19 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             cmbChiled.ValueMember = "Name";
             cmbChiled.DisplayMember = "Name";
 
+            var column = new DataGridViewButtonColumn
+            {
+                DisplayIndex = 4,
+                HeaderText = "Remove",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                Text = "Remove",
+                UseColumnTextForButtonValue = true
+            };
             
             source.DataSource = frm.Relations;
             dataGridView1.DataSource = source;
+
+            dataGridView1.Columns.Add(column);
         }
 
         private void BtnOK_Click(object sender, EventArgs e)
@@ -49,6 +59,17 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
                 ChiledName = cmbChiled.SelectedValue.ToString(),
                 ForeignKey=$"{cmbParent.SelectedValue}Id"
             });
+
+            source.ResetBindings(false);
+        }
+
+        private void DataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex != 0)
+                return;
+
+            FrmMain frm = Application.OpenForms["FrmMain"] as FrmMain;
+            frm.Relations.RemoveAt(e.RowIndex);
 
             source.ResetBindings(false);
         }

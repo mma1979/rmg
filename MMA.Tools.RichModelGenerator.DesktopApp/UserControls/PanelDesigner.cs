@@ -64,10 +64,13 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
         private void BtnRemove_Click(object sender, EventArgs e)
         {
             var btn = sender as Button;
+            var tableName = btn.Tag.ToString();
             FrmMain frm = Application.OpenForms["FrmMain"] as FrmMain;
-            var table = frm.Tables.First(t => t.Name == btn.Tag.ToString());
+            var table = frm.Tables.First(t => t.Name == tableName);
             frm.Tables.Remove(table);
-            frm.Controls.RemoveByKey(btn.Tag.ToString());
+            frm.Controls.RemoveByKey(tableName);
+
+            frm.Relations.RemoveAll(r => r.ChiledName == tableName || r.ParentName == tableName);
         }
 
         public PanelDesigner(string name = "table1", int x = 31, int y = 35, string idType = "long")
