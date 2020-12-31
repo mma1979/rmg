@@ -24,8 +24,8 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
         private void LoadData()
         {
             FrmMain frm = Application.OpenForms["FrmMain"] as FrmMain;
-            var tables1 = frm.Tables.Select(t => new { t.Name }).ToList();
-            var tables2 = frm.Tables.Select(t => new { t.Name }).ToList();
+            var tables1 = frm.TableDesigners.Select(t => new { t.Name }).ToList();
+            var tables2 = frm.TableDesigners.Select(t => new { t.Name }).ToList();
             cmbParent.DataSource = tables1;
             cmbParent.ValueMember = "Name";
             cmbParent.DisplayMember = "Name";

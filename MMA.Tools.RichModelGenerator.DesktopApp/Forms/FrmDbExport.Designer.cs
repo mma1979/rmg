@@ -34,6 +34,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Forms
             this.txtConnectionString = new System.Windows.Forms.RichTextBox();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnOK = new System.Windows.Forms.Button();
+            this.btnConnBuilder = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -47,6 +48,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Forms
             // 
             // txtConnectionString
             // 
+            this.txtConnectionString.Font = new System.Drawing.Font("Times New Roman", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtConnectionString.Location = new System.Drawing.Point(12, 29);
             this.txtConnectionString.Name = "txtConnectionString";
             this.txtConnectionString.Size = new System.Drawing.Size(757, 108);
@@ -73,6 +75,16 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Forms
             this.btnOK.UseVisualStyleBackColor = true;
             this.btnOK.Click += new System.EventHandler(this.BtnOK_Click);
             // 
+            // btnConnBuilder
+            // 
+            this.btnConnBuilder.Location = new System.Drawing.Point(12, 156);
+            this.btnConnBuilder.Name = "btnConnBuilder";
+            this.btnConnBuilder.Size = new System.Drawing.Size(141, 23);
+            this.btnConnBuilder.TabIndex = 9;
+            this.btnConnBuilder.Text = "Build Connection";
+            this.btnConnBuilder.UseVisualStyleBackColor = true;
+            this.btnConnBuilder.Click += new System.EventHandler(this.BtnConnBuilder_Click);
+            // 
             // FrmDbExport
             // 
             this.AcceptButton = this.btnOK;
@@ -80,6 +92,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(789, 192);
+            this.Controls.Add(this.btnConnBuilder);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOK);
             this.Controls.Add(this.txtConnectionString);
@@ -89,6 +102,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Forms
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FrmDbExport";
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Export from Database";
             this.ResumeLayout(false);
@@ -99,8 +113,9 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Forms
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.RichTextBox txtConnectionString;
+        public System.Windows.Forms.RichTextBox txtConnectionString;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnOK;
+        private System.Windows.Forms.Button btnConnBuilder;
     }
 }

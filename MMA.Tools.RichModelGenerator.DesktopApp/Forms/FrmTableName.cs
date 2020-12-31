@@ -21,9 +21,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
         private void BtnOK_Click(object sender, EventArgs e)
         {
             FrmMain frm = Application.OpenForms["FrmMain"] as FrmMain;
-            frm.OK = true;
-            frm.TableName = txtName.Text;
-            frm.IdType = comIdType.Text;
+            frm.AddTable(txtName.Text, comIdType.Text);
             Close();
         }
 

@@ -22,9 +22,9 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Forms
         private void BtnSave_Click(object sender, EventArgs e)
         {
             FrmMain frm = Application.OpenForms["FrmMain"] as FrmMain;
-            if (frm.Tables.Any())
+            if (frm.TableDesigners.Any())
             {
-                Engine.Start(frm.Tables, frm.Relations, txtName.Text);
+                Engine.Start(frm.TableDesigners, frm.Relations, txtName.Text);
                 Hide();
             }
         }

@@ -28,5 +28,10 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Forms
             frm.ConnectionString = txtConnectionString.Text;
             Close();
         }
+
+        private void BtnConnBuilder_Click(object sender, EventArgs e)
+        {
+            _ = new FrmConnection().ShowDialog();
+        }
     }
 }

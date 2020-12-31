@@ -66,11 +66,41 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
             var btn = sender as Button;
             var tableName = btn.Tag.ToString();
             FrmMain frm = Application.OpenForms["FrmMain"] as FrmMain;
-            var table = frm.Tables.First(t => t.Name == tableName);
-            frm.Tables.Remove(table);
+            var table = frm.TableDesigners.First(t => t.Name == tableName);
+            frm.TableDesigners.Remove(table);
+            var t = frm.Tables.First(t => t.Name == tableName);
+            frm.Tables.Remove(t);
             frm.Controls.RemoveByKey(tableName);
 
             frm.Relations.RemoveAll(r => r.ChiledName == tableName || r.ParentName == tableName);
+
+            frm.TableDesigners.ForEach(t => frm.Controls.RemoveByKey(t.Name));
+            var columns = Screen.PrimaryScreen.WorkingArea.Width / 300;
+            var rows = Screen.PrimaryScreen.WorkingArea.Width / 300;
+
+            var _tables = frm.Tables.Select((t, i) =>
+            {
+
+                var c = i % columns;
+                var r = i / rows;
+
+
+                var x = c * 310;
+                var y = r * 235 + 35;
+
+
+                var panel = new PanelDesigner(t.Name, x, y, t.IdType);
+                t.Columns.ForEach(c =>
+                {
+                    panel.table.Rows.Add(c.Name, c.DataType, c.IsNullable);
+                });
+
+                frm.TableDesigners.Add(panel.table);
+                return panel;
+
+            }).ToList();
+
+            frm.Controls.AddRange(_tables.ToArray());
         }
 
         public PanelDesigner(string name = "table1", int x = 31, int y = 35, string idType = "long")
