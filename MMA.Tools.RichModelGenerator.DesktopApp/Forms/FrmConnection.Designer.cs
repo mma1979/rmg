@@ -104,6 +104,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Forms
             // 
             this.txtPassword.Location = new System.Drawing.Point(93, 62);
             this.txtPassword.Name = "txtPassword";
+            this.txtPassword.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(298, 24);
             this.txtPassword.TabIndex = 1;
             this.txtPassword.TextChanged += new System.EventHandler(this.TxtPassword_TextChanged);
