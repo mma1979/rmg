@@ -20,14 +20,16 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
             var entities = tables.Select(t => ClassGenerate(t, solutionName)).ToList();
             var models = tables.Select(t => ModelsGenerate(t, solutionName)).ToList();
             var validators = tables.Select(t => ValidatorGenerate(t, solutionName)).ToList();
+            var services = tables.Select(t => ServiceGenerate(t, solutionName)).ToList();
+            var controllers = tables.Select(t => ControllerGenerate(t, solutionName)).ToList();
             var dbcontext = DbContextGenerate(tables);
             var mapping = AutoMapperGenerate(tables);
 
-            SaveFiles(solutionName, entities, models, validators, dbcontext, mapping);
+            SaveFiles(solutionName, entities, models, validators, dbcontext, mapping, services, controllers);
 
         }
 
-       
+
 
         public static List<Table> GetTables(List<TableDesigner> tablesSchemes, List<Relation> relations)
         {
@@ -54,14 +56,14 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
                 Name = t.Name,
                 IdType = t.IdType,
                 Columns = tableColumns(t.Rows),
-                TableRelations = relations.Any()?tableRelations(t.Name): new List<TableRelation>()
+                TableRelations = relations.Any() ? tableRelations(t.Name) : new List<TableRelation>()
             }).ToList();
 
             return tables;
         }
-               
 
-        private static void SaveFiles(string solutionName, List<FileModel> entities, List<FileModel> models, List<FileModel> validators, string dbcontext, string mapping)
+
+        private static void SaveFiles(string solutionName, List<FileModel> entities, List<FileModel> models, List<FileModel> validators, string dbcontext, string mapping, List<FileModel> services, List<FileModel> controllers)
         {
             var dialog = new FolderBrowserDialog
             {
@@ -102,6 +104,22 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
             }
             validators.ForEach(f => saveValidators(f));
 
+            void saveService(FileModel f)
+            {
+
+                using var writer = new StreamWriter($"{dialog.SelectedPath}\\{solutionName}\\Services\\{f.FileName}.cs");
+                writer.Write(f.Contents);
+            }
+            services.ForEach(f => saveService(f));
+
+            void saveController(FileModel f)
+            {
+
+                using var writer = new StreamWriter($"{dialog.SelectedPath}\\{solutionName}\\AppAPI\\Controllers\\{f.FileName}.cs");
+                writer.Write(f.Contents);
+            }
+            controllers.ForEach(f => saveController(f));
+
 
 
             using var contextWriter = new StreamWriter($"{dialog.SelectedPath}\\{solutionName}\\ApplicationDbContex.cs");
@@ -118,7 +136,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
             StringBuilder builder = new StringBuilder(Templates.CLASS_TEMPLATE);
             builder.Replace("@SolutionName@", solutionName)
                 .Replace("@ClassName@", table.Name)
-                .Replace("@TID@", string.IsNullOrEmpty(table.IdType)?"long":table.IdType)
+                .Replace("@TID@", string.IsNullOrEmpty(table.IdType) ? "long" : table.IdType)
                 .Replace("@ValidatorType@", $"{table.Name}Validator")
                 .Replace("@PrivateConst@", BuildPrivateConst(table))
                 .Replace("@PublicConst@", BuildPublicConst(table))
@@ -165,7 +183,37 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
             };
         }
 
-        private static (string,string) TableDbContext(Table table)
+        private static FileModel ServiceGenerate(Table table, string solutionName)
+        {
+            StringBuilder builder = new StringBuilder(Templates.SERVICE_TEMPALTE);
+            builder.Replace("@SolutionName@", solutionName)
+                .Replace("@ClassName@", table.Name)
+                .Replace("@_ClassName@", table.Name.ToLower())
+                .Replace("@ClassNames@", table.SetName);
+
+            return new FileModel
+            {
+                FileName = $"{table.Name}Service",
+                Contents = builder.ToString()
+            };
+        }
+
+        private static FileModel ControllerGenerate(Table table, string solutionName)
+        {
+            StringBuilder builder = new StringBuilder(Templates.API_CONTROLLER_TEMPLATE);
+            builder.Replace("@SolutionName@", solutionName)
+                .Replace("@ClassName@", table.Name)
+                .Replace("@_ClassName@", table.Name.ToLower())
+                .Replace("@ClassNames@", table.SetName);
+
+            return new FileModel
+            {
+                FileName = $"{table.SetName}Controller",
+                Contents = builder.ToString()
+            };
+        }
+
+        private static (string, string) TableDbContext(Table table)
         {
             string relationsConfig(TableRelation r) =>
                 Templates.RELATION_CONFIG_TEMPLATE
@@ -301,27 +349,37 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
         {
             if (!Directory.Exists($"{root}\\{solutionName}"))
             {
-                Directory.CreateDirectory($"{root}\\{solutionName}");
+                _ = Directory.CreateDirectory($"{root}\\{solutionName}");
             }
 
             if (!Directory.Exists($"{root}\\{solutionName}\\Validations"))
             {
-                Directory.CreateDirectory($"{root}\\{solutionName}\\Validations");
+                _ = Directory.CreateDirectory($"{root}\\{solutionName}\\Validations");
             }
 
             if (!Directory.Exists($"{root}\\{solutionName}\\Models"))
             {
-                Directory.CreateDirectory($"{root}\\{solutionName}\\Models");
+                _ = Directory.CreateDirectory($"{root}\\{solutionName}\\Models");
             }
 
             if (!Directory.Exists($"{root}\\{solutionName}\\Databae\\Tables"))
             {
-                Directory.CreateDirectory($"{root}\\{solutionName}\\Databae\\Tables");
+                _ = Directory.CreateDirectory($"{root}\\{solutionName}\\Databae\\Tables");
+            }
+
+            if (!Directory.Exists($"{root}\\{solutionName}\\Services"))
+            {
+                _ = Directory.CreateDirectory($"{root}\\{solutionName}\\Services");
             }
 
             if (!Directory.Exists($"{root}\\{solutionName}\\Services\\Mapping"))
             {
-                Directory.CreateDirectory($"{root}\\{solutionName}\\Services\\Mapping");
+                _ = Directory.CreateDirectory($"{root}\\{solutionName}\\Services\\Mapping");
+            }
+
+            if (!Directory.Exists($"{root}\\{solutionName}\\AppAPI\\Controllers"))
+            {
+                _ = Directory.CreateDirectory($"{root}\\{solutionName}\\AppAPI\\Controllers");
             }
         }
     }

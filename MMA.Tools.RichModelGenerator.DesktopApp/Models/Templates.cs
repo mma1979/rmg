@@ -213,5 +213,431 @@ modelBuilder.Entity<@ClassName@>(entity =>
         public const string AUTO_MAPPER_TEMPLATE = @" CreateMap<@ClassName@, @ClassName@ReadModel>().IgnoreAllPropertiesWithAnInaccessibleSetter().IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
             CreateMap<@ClassName@, @ClassName@ModifyModel>().IgnoreAllPropertiesWithAnInaccessibleSetter().IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
 ";
+        public const string SERVICE_TEMPALTE = @"
+using AutoMapper;
+using ElmahCore;
+using @SolutionName@.Core.Database.Tables;
+using @SolutionName@.Core.Enums;
+using @SolutionName@.Core.Models;
+using @SolutionName@.EntityFramworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
+
+namespace @SolutionName@.Services
+{
+   
+
+    public class @ClassName@Service
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
+        public @ClassName@Service(ApplicationDbContext context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
+
+
+        public ResultViewModel<List<@ClassName@ReadModel>> All(QueryViewModel<@ClassName@ReadModel> query)
+        {
+            try
+            {
+                query.Order = string.IsNullOrEmpty(query.Order) ? ""Id Desc"" : query.Order;
+                var data = _context.@ClassNames@.AsQueryable();
+                if (!string.IsNullOrEmpty(query.Filter))
+                {
+                    data = data.Where(query.Filter);
+                }
+
+                data = data.OrderBy(query.Order);
+
+                var page = (query.PageNumber <= 0 ? data :
+                           data.Skip((query.PageNumber - 1) * query.PageSize)
+                           .Take(query.PageSize))
+                           .ToList();
+
+
+
+                return new ResultViewModel<List<@ClassName@ReadModel>>
+                {
+                    IsSuccess = true,
+                    Data = _mapper.Map<List<@ClassName@ReadModel>>(page),
+                    Filter = query.Filter,
+                    PageNumber = query.PageNumber,
+                    PageSize = query.PageSize,
+                    Total = data.Count()
+                };
+            }
+            catch (Exception ex)
+            {
+
+                ElmahExtensions.RiseError(ex);
+                return new ResultViewModel<List<@ClassName@ReadModel>>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Filter = query.Filter,
+                    PageNumber = query.PageNumber,
+                    PageSize = query.PageSize,
+                    Total = 0,
+                    Exception = ex
+                };
+            }
+        }
+
+        public ResultViewModel<@ClassName@ModifyModel> Find(Expression<Func<@ClassName@, bool>> predicate)
+        {
+            try
+            {
+                var data = _context.@ClassNames@.FirstOrDefault(predicate);
+                return new ResultViewModel<@ClassName@ModifyModel>
+                {
+                    IsSuccess = true,
+                    Data = _mapper.Map<@ClassName@ModifyModel>(data),
+                    Total = 1
+                };
+            }
+            catch (Exception ex)
+            {
+
+                ElmahExtensions.RiseError(ex);
+                return new ResultViewModel<@ClassName@ModifyModel>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Total = 0,
+                    Exception = ex
+                };
+            }
+        }
+        public ResultViewModel<@ClassName@ModifyModel> Find(int id)
+        {
+            try
+            {
+                var data = _context.@ClassNames@.Find(id);
+                return new ResultViewModel<@ClassName@ModifyModel>
+                {
+                    IsSuccess = true,
+                    Data = _mapper.Map<@ClassName@ModifyModel>(data),
+                    Total = 1
+                };
+            }
+            catch (Exception ex)
+            {
+
+                ElmahExtensions.RiseError(ex);
+                return new ResultViewModel<@ClassName@ModifyModel>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Total = 0,
+                    Exception = ex
+                };
+            }
+        }
+
+        
+        public ResultViewModel<@ClassName@ModifyModel> Add(@ClassName@ModifyModel model)
+        {
+            try
+            {
+                var @_ClassName@ = new @ClassName@(model);
+                //TODO: Handel chiledren
+                var entity = _context.@ClassNames@.Add(@_ClassName@);
+                _ = _context.SaveChanges();
+                return new ResultViewModel<@ClassName@ModifyModel>
+                {
+                    IsSuccess = true,
+                    Data = _mapper.Map<@ClassName@ModifyModel>(entity.Entity),
+                    Total = 1
+                };
+
+            }
+            catch (Exception ex)
+            {
+
+                ElmahExtensions.RiseError(ex);
+                return new ResultViewModel<@ClassName@ModifyModel>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Total = 0,
+                    Exception = ex
+                };
+            }
+        }
+
+        public ResultViewModel<@ClassName@ModifyModel> Update(@ClassName@ModifyModel model)
+        {
+            try
+            {
+                var @_ClassName@ = _context.@ClassNames@.Find(model.Id);
+                if (@_ClassName@ == null)
+                {
+                    var exp = new KeyNotFoundException($""item number {model.Id} does not Exist"");
+                    ElmahExtensions.RiseError(exp);
+                    return new ResultViewModel<@ClassName@ModifyModel>
+                    {
+                        IsSuccess = false,
+                        Data = null,
+                        Total = 0,
+                        Exception = exp,
+                        Messages = new List<string> { ""ItemNotFound"" } 
+                    };
+                }
+
+                //TODO: Hanlde Update
+               
+                _ = _context.SaveChanges();
+                return new ResultViewModel<@ClassName@ModifyModel>
+                {
+                    IsSuccess = true,
+                    Data = _mapper.Map<@ClassName@ModifyModel>(entity),
+                    Total = 1
+                };
+
+            }
+            catch (Exception ex)
+            {
+
+                ElmahExtensions.RiseError(ex);
+                return new ResultViewModel<@ClassName@ModifyModel>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Total = 0,
+                    Exception = ex
+                };
+            }
+        }
+
+        public ResultViewModel<@ClassName@ModifyModel> Delete(int id)
+        {
+            try
+            {
+                var @_ClassName@ = _context.@ClassNames@.Find(id);
+                if (@_ClassName@ == null)
+                {
+                    var exp = new KeyNotFoundException($""item number {id} does not Exist"");
+                    ElmahExtensions.RiseError(exp);
+                    return new ResultViewModel<@ClassName@ModifyModel>
+                    {
+                        IsSuccess = false,
+                        Data = null,
+                        Total = 0,
+                        Exception = exp,
+                        Messages = new List<string> { ""ItemNotFound"" } 
+                    };
+                }
+                var entity = @_ClassName@.Delete();
+                _ = _context.SaveChanges();
+                return new ResultViewModel<@ClassName@ModifyModel>
+                {
+                    IsSuccess = true,
+                    Data = _mapper.Map<@ClassName@ModifyModel>(entity),
+                    Total = 1
+                };
+
+            }
+            catch (Exception ex)
+            {
+
+                ElmahExtensions.RiseError(ex);
+                return new ResultViewModel<@ClassName@ModifyModel>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Total = 0,
+                    Exception = ex
+                };
+            }
+        }
+
+
+    }
+}
+
+";
+        public const string API_CONTROLLER_TEMPLATE = @"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using ElmahCore;
+using @SolutionName@.Common;
+using @SolutionName@.Core.Database.Tables;
+using @SolutionName@.Core.Models;
+using @SolutionName@.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace @SolutionName@.AppAPI.Controllers
+{
+    [Route(""api/[controller]"")]
+    [ApiController]
+    public class @ClassNames@Controller : BaseController
+    {
+        private readonly @ClassName@Service _@_ClassName@Service;
+        private readonly Translator _translator;
+
+        public @ClassNames@Controller(@ClassName@Service @_ClassName@Service, Translator translator):base(translator)
+        {
+            _@_ClassName@Service = @_ClassName@Service;
+            _translator = translator;
+        }
+
+
+
+        [HttpGet]
+        public ActionResult<ResultViewModel<List<@ClassName@ReadModel>>> GetAll([FromQuery] QueryViewModel<@ClassName@ReadModel> query)
+        {
+            var result = new ResultViewModel<List<@ClassName@ReadModel>>();
+            try
+            {
+                query.UserId = User.Claims.FirstOrDefault(c => c.Type == ""UserId"")?.Value.ToNullableLong();
+                query.@ClassName@Id = User.Claims.FirstOrDefault(c => c.Type == ""@ClassName@Id"")?.Value.ToNullableLong();
+                var data = _@_ClassName@Service.All(query);
+                data.Messages= data.Messages.Select(m => _translator.Translate(m, Language)).ToList();
+                return Ok(data);
+
+            }
+            catch (HttpException ex)
+            {
+
+                ElmahExtensions.RiseError(HttpContext, ex);
+                return Ok(HandleHttpException<List<@ClassName@ReadModel>>(ex));
+            }
+            catch (Exception ex)
+            {
+
+                ElmahExtensions.RiseError(HttpContext, ex);
+                result.IsSuccess = false;
+                result.Exception = ex;
+                return Ok(result);
+            }
+        }
+
+        [HttpGet(""{id}"")]
+        public ActionResult<ResultViewModel<@ClassName@ModifyModel>> GetOne(int id)
+        {
+            var result = new ResultViewModel<@ClassName@ModifyModel>();
+            try
+            {
+                var data = _@_ClassName@Service.Find(id);
+                data.Messages = data.Messages.Select(m => _translator.Translate(m, Language)).ToList();
+                return Ok(data);
+
+            }
+            catch (HttpException ex)
+            {
+
+                ElmahExtensions.RiseError(HttpContext, ex);
+                return Ok(HandleHttpException<@ClassName@ModifyModel>(ex));
+            }
+            catch (Exception ex)
+            {
+
+                ElmahExtensions.RiseError(HttpContext, ex);
+                result.IsSuccess = false;
+                result.Exception = ex;
+                return Ok(result);
+            }
+        }
+
+        //TODO: Handle Children
+
+        [HttpPost]
+        public ActionResult<ResultViewModel<@ClassName@ModifyModel>> Post@ClassName@([FromBody] @ClassName@ModifyModel model)
+        {
+            var result = new ResultViewModel<@ClassName@>();
+            try
+            {
+                var data = _@_ClassName@Service.Add(model);
+                data.Messages = data.Messages.Select(m => _translator.Translate(m, Language)).ToList();
+                return Ok(data);
+
+            }
+            catch (HttpException ex)
+            {
+
+                ElmahExtensions.RiseError(HttpContext, ex);
+                return Ok(HandleHttpException<@ClassName@ModifyModel>(ex));
+            }
+            catch (Exception ex)
+            {
+
+                ElmahExtensions.RiseError(HttpContext, ex);
+                result.IsSuccess = false;
+                result.Exception = ex;
+                return Ok(result);
+            }
+        }
+
+        [HttpPut(""{id}"")]
+        public ActionResult<ResultViewModel<@ClassName@ModifyModel>> Put@ClassName@(int id, [FromBody] @ClassName@ModifyModel model)
+        {
+            var result = new ResultViewModel<@ClassName@>();
+            try
+            {
+                if (model.Id != id)
+                {
+                    result.IsSuccess = false;
+                    result.Messages.Add(_translator.Translate(""InvalidData"", Language));
+                    return Ok(result);
+                }
+                var data = _@_ClassName@Service.Update(model);
+                data.Messages = data.Messages.Select(m => _translator.Translate(m, Language)).ToList();
+                return Ok(data);
+
+            }
+            catch (HttpException ex)
+            {
+
+                ElmahExtensions.RiseError(HttpContext, ex);
+                return Ok(HandleHttpException<@ClassName@ModifyModel>(ex));
+            }
+            catch (Exception ex)
+            {
+
+                ElmahExtensions.RiseError(HttpContext, ex);
+                result.IsSuccess = false;
+                result.Exception = ex;
+                return Ok(result);
+            }
+        }
+
+        [HttpDelete(""{id}"")]
+        public ActionResult<ResultViewModel<@ClassName@ModifyModel>> Delete@ClassName@(int id)
+        {
+            var result = new ResultViewModel<@ClassName@ModifyModel>();
+            try
+            {
+                var data = _@_ClassName@Service.Delete(id);
+                data.Messages = data.Messages.Select(m => _translator.Translate(m, Language)).ToList();
+                return Ok(data);
+
+            }
+            catch (HttpException ex)
+            {
+
+                ElmahExtensions.RiseError(HttpContext, ex);
+                return Ok(HandleHttpException<@ClassName@ModifyModel>(ex));
+            }
+            catch (Exception ex)
+            {
+
+                ElmahExtensions.RiseError(HttpContext, ex);
+                result.IsSuccess = false;
+                result.Exception = ex;
+                return Ok(result);
+            }
+        }
+
+
+    }
+
+}
+";
     }
 }
