@@ -325,9 +325,9 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
 
         private static string BuildModelsNavigationProps(Table table)
         {
-            string collectionProp(TableRelation r) => $"public List<{r.RelatedTableName}ReadModel> {r.SetRelatedTableName} {{ get; set; }}";
+            string collectionProp(TableRelation r) => $"public List<{r.RelatedTableName}ModifyModel> {r.SetRelatedTableName} {{ get; set; }}";
 
-            string singleProp(TableRelation r) => $"public  {r.RelatedTableName}ReadModel {r.RelatedTableName} {{ get; set; }}";
+            string singleProp(TableRelation r) => $"public  {r.RelatedTableName}ModifyModel {r.RelatedTableName} {{ get; set; }}";
 
             var props = table.TableRelations
                 .Select(r => r.IsCollection ? collectionProp(r) : singleProp(r))
