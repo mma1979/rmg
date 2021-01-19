@@ -278,7 +278,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
         private static string BuildProps(Table table, bool isPrivateSet)
         {
             var modifier = isPrivateSet ? "private " : "";
-            string nullable(Column c) => c.IsNullable ? "?" : "";
+            string nullable(Column c) => c.IsNullable && c.DataType!="string" ? "?" : "";
             var props = table.Columns
                 .Select(c => $"public {c.DataType}{nullable(c)} {c.Name} {{get; {modifier}set;}}")
                 .ToList();

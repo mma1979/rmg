@@ -497,7 +497,7 @@ namespace @SolutionName@.AppAPI.Controllers
             try
             {
                 query.UserId = User.Claims.FirstOrDefault(c => c.Type == ""UserId"")?.Value.ToNullableLong();
-                query.@ClassName@Id = User.Claims.FirstOrDefault(c => c.Type == ""@ClassName@Id"")?.Value.ToNullableLong();
+                query.CompanyId = User.Claims.FirstOrDefault(c => c.Type == ""CompanyId"")?.Value.ToNullableLong();
                 var data = _@_ClassName@Service.All(query);
                 data.Messages= data.Messages.Select(m => _translator.Translate(m, Language)).ToList();
                 return Ok(data);
