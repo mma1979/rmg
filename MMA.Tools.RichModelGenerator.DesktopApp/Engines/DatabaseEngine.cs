@@ -96,7 +96,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
                 {
                     Name = c.column_name,
                     DataType = MapDataType(c.data_type),
-                    IsNullable = true
+                    IsNullable = c.is_nullable
                 }).ToList();
             var tableRelations = relations
                 .Where(r => r.CurrentTable == tableName || r.RelatedTableName == tableName)
