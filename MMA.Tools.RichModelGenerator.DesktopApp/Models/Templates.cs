@@ -157,21 +157,21 @@ modelBuilder.Entity<@ClassName@>(entity =>
     public @ClassName@ Add@RelatedName@(@RelatedName@ModifyModel model)
         {
 
-            @SetRelatedName@ ??= new HashSet<Project>();
-            @SetRelatedName@.Add(new Project(model));
+            @SetRelatedName@ ??= new HashSet<@RelatedName@>();
+            @SetRelatedName@.Add(new @RelatedName@(model));
 
             return this;
         }
-        public @ClassName@ Update@RelatedName@(long id, @RelatedName@ModifyModel model)
+        public @ClassName@ Update@RelatedName@(@RelatedName@ModifyModel model)
         {
-            if (id <= 0)
+            if (model.Id <= 0)
             {
                 throw new HttpException(LoggingEvents.CREATE_ITEM, ""InvalidData"");
             }
 
 
         @SetRelatedName@ ??= new HashSet<@RelatedName@>();
-                var entity = @SetRelatedName@.First(e => e.Id == id);
+                var entity = @SetRelatedName@.First(e => e.Id == model.Id);
         entity.Update(model);
 
             return this;
@@ -184,27 +184,27 @@ modelBuilder.Entity<@ClassName@>(entity =>
         }
 
 
-        @SetRelatedName@ ??= new HashSet<Project>();
+        @SetRelatedName@ ??= new HashSet<@RelatedName@>();
         var entity = @SetRelatedName@.First(e => e.Id == id);
         @SetRelatedName@.Remove(entity);
 
         return this;
         }
 
-        public @ClassName@ Update@SetRelatedName@(HashSet<@RelatedName@> @_SetRelatedName@)
+        public @ClassName@ Update@SetRelatedName@(HashSet<@RelatedName@ModifyModel> @_SetRelatedName@)
         {
             var currentIds = @_SetRelatedName@.Select(e => e.Id).ToList();
-            var removed = @RelatedName@.Where(e => !currentIds.Contains(e.Id)).ToList();
+            var removed = @SetRelatedName@.Where(e => !currentIds.Contains(e.Id)).ToList();
 
             var updated = @_SetRelatedName@.Where(e => e.Id > 0).ToList();
 
             var inserted = @_SetRelatedName@.Where(e => e.Id == 0).ToList();
 
             removed.ForEach(e => Remove@RelatedName@(e.Id));
-            inserted.ForEach(e => Add@RelatedName@(new @RelatedName@ModifyModel(e)));
+            inserted.ForEach(e => Add@RelatedName@(e));
             if (updated.Any())
             {
-                updated.ForEach(e => Update@RelatedName@(new @RelatedName@ModifyModel(e)));
+                updated.ForEach(e => Update@RelatedName@(e));
             }
 
         return this;
@@ -390,6 +390,7 @@ namespace @SolutionName@.Services
                 }
 
                 //TODO: Hanlde Update
+                var entity = @_ClassName@.Update(model)
                
                 _ = _context.SaveChanges();
                 return new ResultViewModel<@ClassName@ModifyModel>
