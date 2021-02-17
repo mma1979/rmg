@@ -141,7 +141,7 @@ namespace @SolutionName@.Core.Validations
 public virtual DbSet<@ClassName@> @ClassNames@ { get; set; }";
         public const string DBCONTEXT_OnModelCreating_TEMPLATE = @"modelBuilder.ApplyConfiguration(new  @ClassName@EntityConfiguration());";
         public const string RELATION_CONFIG_TEMPLATE = @"
- entity.HasMany(e => e.@Children@).WithOne(e => e.@Parent@).HasForeignKey(e => e.@ForeignKey@).OnDelete(DeleteBehavior.Cascade);
+ modelBuilder.HasMany(e => e.@Children@).WithOne(e => e.@Parent@).HasForeignKey(e => e.@ForeignKey@).OnDelete(DeleteBehavior.Cascade);
 ";
         public const string CHILED_FUNCTIONS_TEMPLATE = @"
     public @ClassName@ Add@RelatedName@(@RelatedName@ModifyModel model)
