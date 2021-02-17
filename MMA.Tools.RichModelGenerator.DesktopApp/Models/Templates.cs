@@ -662,9 +662,9 @@ namespace @SolutionName@.EntityFrameworkCore.EntityConfigurations
             modelBuilder.ToTable(""@ClassNames@"", _schema);
         modelBuilder.HasKey(e => e.Id);
         //modelBuilder.Property(e => e.Id).ValueGeneratedNever();
-         modelBuilder.HasQueryFilter(e => e.IsDeleted != true);
-        modelBuilder.Property(e => e.IsDeleted).HasDefaultValueSql(""((0))"");
-        modelBuilder.Property(e => e.CreatedDate).HasDefaultValueSql(""(getdate())"");
+          modelBuilder.HasQueryFilter(e => e.IsActive != false);
+          modelBuilder.Property(e => e.IsActive).HasDefaultValueSql(""((1))"");
+          modelBuilder.Property(e => e.CreatedDate).HasDefaultValueSql(""(getdate())"");
         @RelationsConfig@
         }
 }
