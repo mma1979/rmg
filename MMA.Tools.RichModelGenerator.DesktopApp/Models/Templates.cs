@@ -219,7 +219,7 @@ using ElmahCore;
 using @SolutionName@.Core.Database.Tables;
 using @SolutionName@.Core.Enums;
 using @SolutionName@.Core.Models;
-using @SolutionName@.EntityFramworkCore;
+using @SolutionName@.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -390,7 +390,7 @@ namespace @SolutionName@.Services
                 }
 
                 //TODO: Hanlde Update
-                var entity = @_ClassName@.Update(model)
+                var entity = @_ClassName@.Update(model);
                
                 _ = _context.SaveChanges();
                 return new ResultViewModel<@ClassName@ModifyModel>
@@ -640,5 +640,34 @@ namespace @SolutionName@.AppAPI.Controllers
 
 }
 ";
+        public const string ENTITY_CONFIGURATIONS_TEMPLATE = @"using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using @SolutionName@.Common;
+using @SolutionName@.Core.Database.Identity;
+using @SolutionName@.Core.Models;
+using @SolutionName@.Core.Validations;
+using @SolutionName@.Core.Database.Tables;
+namespace @SolutionName@.EntityFrameworkCore.EntityConfigurations
+{
+    public class @ClassName@EntityConfiguration : IEntityTypeConfiguration<@ClassName@>
+    {
+        private readonly string _schema;
+        public @ClassName@EntityConfiguration(string schema=""dbo"")
+        {
+            _schema = schema;
+        }
+    public void Configure(EntityTypeBuilder<@ClassName@> modelBuilder)
+    {
+        if (!string.IsNullOrWhiteSpace(_schema))
+            modelBuilder.ToTable(""@ClassNames@"", _schema);
+        modelBuilder.HasKey(e => e.Id);
+        //modelBuilder.Property(e => e.Id).ValueGeneratedNever();
+         modelBuilder.HasQueryFilter(e => e.IsDeleted != true);
+        modelBuilder.Property(e => e.IsDeleted).HasDefaultValueSql(""((0))"");
+        modelBuilder.Property(e => e.CreatedDate).HasDefaultValueSql(""(getdate())"");
+        @RelationsConfig@
+        }
+}
+}";
     }
 }

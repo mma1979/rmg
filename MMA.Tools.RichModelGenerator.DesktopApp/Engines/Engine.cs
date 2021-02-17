@@ -22,10 +22,11 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
             var validators = tables.Select(t => ValidatorGenerate(t, solutionName)).ToList();
             var services = tables.Select(t => ServiceGenerate(t, solutionName)).ToList();
             var controllers = tables.Select(t => ControllerGenerate(t, solutionName)).ToList();
+            var configurations = tables.Select(t => EntityConfigurationGenerate(t, solutionName)).ToList();
             var dbcontext = DbContextGenerate(tables);
             var mapping = AutoMapperGenerate(tables);
 
-            SaveFiles(solutionName, entities, models, validators, dbcontext, mapping, services, controllers);
+            SaveFiles(solutionName, entities, models, validators, dbcontext, mapping, services, controllers, configurations);
 
         }
 
@@ -63,7 +64,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
         }
 
 
-        private static void SaveFiles(string solutionName, List<FileModel> entities, List<FileModel> models, List<FileModel> validators, string dbcontext, string mapping, List<FileModel> services, List<FileModel> controllers)
+        private static void SaveFiles(string solutionName, List<FileModel> entities, List<FileModel> models, List<FileModel> validators, string dbcontext, string mapping, List<FileModel> services, List<FileModel> controllers, List<FileModel> configurations)
         {
             var dialog = new FolderBrowserDialog
             {
@@ -119,6 +120,15 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
                 writer.Write(f.Contents);
             }
             controllers.ForEach(f => saveController(f));
+
+
+            void saveConfigurations(FileModel f)
+            {
+
+                using var writer = new StreamWriter($"{dialog.SelectedPath}\\{solutionName}\\EntityFrameworkCore\\EntityConfigurations\\{ f.FileName}.cs");
+                writer.Write(f.Contents);
+            }
+            configurations.ForEach(f => saveConfigurations(f));
 
 
 
@@ -209,6 +219,32 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
             return new FileModel
             {
                 FileName = $"{table.SetName}Controller",
+                Contents = builder.ToString()
+            };
+        }
+
+        private static FileModel EntityConfigurationGenerate(Table table, string solutionName)
+        {
+            string relationsConfig(TableRelation r) =>
+                Templates.RELATION_CONFIG_TEMPLATE
+                .Replace("@Children@", r.SetRelatedTableName)
+                .Replace("@Parent@", table.Name)
+                .Replace("@ForeignKey@", $"{table.Name}Id");
+
+            List<string> buildRelationsConfig(List<TableRelation> relations) =>
+                relations.Where(r => r.IsCollection)
+                .Select(r => relationsConfig(r))
+                .ToList();
+
+            StringBuilder builder = new StringBuilder(Templates.ENTITY_CONFIGURATIONS_TEMPLATE);
+            builder.Replace("@SolutionName@", solutionName)
+                .Replace("@ClassName@", table.Name)
+                 .Replace("@ClassNames@", table.SetName)
+                .Replace("@RelationsConfig@", string.Join("\n", buildRelationsConfig(table.TableRelations))); ;
+
+            return new FileModel
+            {
+                FileName = $"{table.Name}EntityConfiguration",
                 Contents = builder.ToString()
             };
         }
@@ -380,6 +416,11 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
             if (!Directory.Exists($"{root}\\{solutionName}\\AppAPI\\Controllers"))
             {
                 _ = Directory.CreateDirectory($"{root}\\{solutionName}\\AppAPI\\Controllers");
+            }
+
+            if (!Directory.Exists($"{root}\\{solutionName}\\EntityFrameworkCore\\EntityConfigurations"))
+            {
+                Directory.CreateDirectory($"{root}\\{solutionName}\\EntityFrameworkCore\\EntityConfigurations");
             }
         }
     }

@@ -101,6 +101,12 @@
     <Compile Include="Forms\FrmSave.Designer.cs">
       <DependentUpon>FrmSave.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FrmSelectTables.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FrmSelectTables.Designer.cs">
+      <DependentUpon>FrmSelectTables.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\DatabaseScheme.cs" />
     <Compile Include="Models\EngineModels.cs" />
     <Compile Include="Forms\FrmMain.cs">
@@ -153,6 +159,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FrmSave.resx">
       <DependentUpon>FrmSave.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FrmSelectTables.resx">
+      <DependentUpon>FrmSelectTables.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FrmTableName.resx">
       <DependentUpon>FrmTableName.cs</DependentUpon>
