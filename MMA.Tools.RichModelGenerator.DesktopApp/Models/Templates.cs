@@ -139,17 +139,7 @@ namespace @SolutionName@.Core.Validations
 ";
         public const string DBCONTEXT_SET_TEMPLATE = @"
 public virtual DbSet<@ClassName@> @ClassNames@ { get; set; }";
-        public const string DBCONTEXT_OnModelCreating_TEMPLATE = @"
-
-modelBuilder.Entity<@ClassName@>(entity =>
-            {
-                entity.HasQueryFilter(e => e.IsActive != false);
-                entity.Property(e => e.IsActive).HasDefaultValueSql(""((1))"");
-                entity.Property(e => e.CreatedDate).HasDefaultValueSql(""(getdate())"");
-                @RelationsConfig@
-
-    });
-";
+        public const string DBCONTEXT_OnModelCreating_TEMPLATE = @"modelBuilder.ApplyConfiguration(new  @ClassName@EntityConfiguration());";
         public const string RELATION_CONFIG_TEMPLATE = @"
  entity.HasMany(e => e.@Children@).WithOne(e => e.@Parent@).HasForeignKey(e => e.@ForeignKey@).OnDelete(DeleteBehavior.Cascade);
 ";

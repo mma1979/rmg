@@ -251,25 +251,12 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
 
         private static (string, string) TableDbContext(Table table)
         {
-            string relationsConfig(TableRelation r) =>
-                Templates.RELATION_CONFIG_TEMPLATE
-                .Replace("@Children@", r.SetRelatedTableName)
-                .Replace("@Parent@", table.Name)
-                .Replace("@ForeignKey@", $"{table.Name}Id");
-
-            List<string> buildRelationsConfig(List<TableRelation> relations) =>
-                relations.Where(r => r.IsCollection)
-                .Select(r => relationsConfig(r))
-                .ToList();
-
             StringBuilder builder = new StringBuilder(Templates.DBCONTEXT_SET_TEMPLATE);
             builder.Replace("@ClassName@", table.Name)
                 .Replace("@ClassNames@", table.SetName);
 
             StringBuilder configBuilder = new StringBuilder(Templates.DBCONTEXT_OnModelCreating_TEMPLATE);
-            configBuilder
-                .Replace("@ClassName@", table.Name)
-                .Replace("@RelationsConfig@", string.Join("\n", buildRelationsConfig(table.TableRelations)));
+            configBuilder.Replace("@ClassName@", table.Name);
 
             return (builder.ToString(), configBuilder.ToString());
         }
