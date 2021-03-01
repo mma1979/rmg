@@ -653,8 +653,12 @@ namespace @SolutionName@.EntityFrameworkCore.EntityConfigurations
         modelBuilder.HasKey(e => e.Id);
         //modelBuilder.Property(e => e.Id).ValueGeneratedNever();
           modelBuilder.HasQueryFilter(e => e.IsActive != false);
-          modelBuilder.Property(e => e.IsActive).HasDefaultValueSql(""((1))"");
-          modelBuilder.Property(e => e.CreatedDate).HasDefaultValueSql(""(getdate())"");
+          modelBuilder.Property(e => e.IsActive)
+                .IsRequired()
+                .HasDefaultValueSql(""((1))"");
+          modelBuilder.Property(e => e.CreatedDate)
+                .IsRequired()
+                .HasDefaultValueSql(""(getdate())"");
         @RelationsConfig@
         }
 }

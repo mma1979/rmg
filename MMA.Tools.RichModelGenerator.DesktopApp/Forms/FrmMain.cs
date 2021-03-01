@@ -49,6 +49,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
         public void AddTable(string tableName, string idType)
         {
             TableDesigners.ForEach(t => Controls.RemoveByKey(t.Name));
+            tables = Engine.GetTables(TableDesigners, Relations);
             tables.Add(new Table
             {
                 Name = tableName,
