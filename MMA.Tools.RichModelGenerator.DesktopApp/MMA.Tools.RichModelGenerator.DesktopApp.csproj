@@ -130,6 +130,7 @@
     <Compile Include="Models\ExportImportModel.cs" />
     <Compile Include="Models\FileModel.cs" />
     <Compile Include="Models\Relation.cs" />
+    <Compile Include="Models\TableComparer.cs" />
     <Compile Include="UserControls\PanelDesigner.cs">
       <SubType>Component</SubType>
     </Compile>

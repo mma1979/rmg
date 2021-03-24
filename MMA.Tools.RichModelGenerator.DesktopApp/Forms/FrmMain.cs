@@ -38,9 +38,11 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
         public string ConnectionString { get; set; }
 
         public List<Relation> Relations { get; set; }
+
         public FrmMain()
         {
             InitializeComponent();
+
             Relations = new List<Relation>();
             tables = new List<Table>();
 
@@ -49,7 +51,8 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
         public void AddTable(string tableName, string idType)
         {
             TableDesigners.ForEach(t => Controls.RemoveByKey(t.Name));
-            tables = Engine.GetTables(TableDesigners, Relations);
+            tables = Engine.GetTables(TableDesigners, Relations).Distinct(new TableComparer()).ToList();
+            TableDesigners.Clear();
             tables.Add(new Table
             {
                 Name = tableName,
