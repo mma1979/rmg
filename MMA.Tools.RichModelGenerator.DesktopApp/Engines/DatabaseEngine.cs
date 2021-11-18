@@ -1,8 +1,9 @@
-﻿using MMA.Tools.RichModelGenerator.DesktopApp.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+
+using MMA.Tools.RichModelGenerator.DesktopApp.Models;
 
 namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
 {
@@ -16,22 +17,22 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
         public List<DatabaseScheme> ReadTablesScheme()
         {
             using var ad = new SqlDataAdapter(@"select schema_name(tab.schema_id) as schema_name,
-                        tab.name as table_name, 
-                        col.column_id,
-                        col.name as column_name, 
-                        t.name as data_type,    
-                        col.max_length,
-                        col.precision,
-                        col.is_nullable
-                    from sys.tables as tab
-                        inner join sys.columns as col
-                            on tab.object_id = col.object_id
-                        left join sys.types as t
-                        on col.user_type_id = t.user_type_id
-                   where tab.name not in ( '__EFMigrationsHistory','sysdiagrams') and col.name not in ('CreatedBy','CreatedDate','ModifiedBy','ModifiedDate','IsActive')
-                    order by schema_name,
-                        table_name, 
-                        column_id;", ConnectionString);
+						tab.name as table_name, 
+						col.column_id,
+						col.name as column_name, 
+						t.name as data_type,    
+						col.max_length,
+						col.precision,
+						col.is_nullable
+					from sys.tables as tab
+						inner join sys.columns as col
+							on tab.object_id = col.object_id
+						left join sys.types as t
+						on col.user_type_id = t.user_type_id
+				   where tab.name not in ( '__EFMigrationsHistory','sysdiagrams') and col.name not in ('CreatedBy','CreatedDate','ModifiedBy','ModifiedDate','IsActive')
+					order by schema_name,
+						table_name, 
+						column_id;", ConnectionString);
 
             using var dt = new DataTable();
             ad.Fill(dt);
@@ -54,25 +55,28 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
         public List<RelationsScheme> ReadRelationsScheme()
         {
             using var ad = new SqlDataAdapter(@"SELECT
-                    --fk.name 'FK Name',
-                    tp.name 'RelatedTableName',
-                    cp.name 'ForeignKey', --cp.column_id,
-                    tr.name 'CurrentTable'
-                    --cr.name, cr.column_id
-                FROM 
-                    sys.foreign_keys fk
-                INNER JOIN 
-                    sys.tables tp ON fk.parent_object_id = tp.object_id
-                INNER JOIN 
-                    sys.tables tr ON fk.referenced_object_id = tr.object_id
-                INNER JOIN 
-                    sys.foreign_key_columns fkc ON fkc.constraint_object_id = fk.object_id
-                INNER JOIN 
-                    sys.columns cp ON fkc.parent_column_id = cp.column_id AND fkc.parent_object_id = cp.object_id
-                INNER JOIN 
-                    sys.columns cr ON fkc.referenced_column_id = cr.column_id AND fkc.referenced_object_id = cr.object_id
-                ORDER BY
-                    tp.name, cp.column_id", ConnectionString);
+					--fk.name 'FK Name',
+					tp.name 'RelatedTableName',
+					cp.name 'ForeignKey', --cp.column_id,
+					tr.name 'CurrentTable',
+					t.name 'DataType'
+					--cr.name, cr.column_id
+				FROM 
+					sys.foreign_keys fk
+				INNER JOIN 
+					sys.tables tp ON fk.parent_object_id = tp.object_id
+				INNER JOIN 
+					sys.tables tr ON fk.referenced_object_id = tr.object_id
+				INNER JOIN 
+					sys.foreign_key_columns fkc ON fkc.constraint_object_id = fk.object_id
+				INNER JOIN 
+					sys.columns cp ON fkc.parent_column_id = cp.column_id AND fkc.parent_object_id = cp.object_id
+				INNER JOIN 
+					sys.columns cr ON fkc.referenced_column_id = cr.column_id AND fkc.referenced_object_id = cr.object_id
+				INNER JOIN
+					sys.types t on t.system_type_id = cp.system_type_id and t.name <> 'sysname'
+				ORDER BY
+					tp.name, cp.column_id", ConnectionString);
 
             using var dt = new DataTable();
             ad.Fill(dt);
@@ -82,7 +86,8 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
                 {
                     CurrentTable = r["CurrentTable"].ToString(),
                     ForeignKey = r["ForeignKey"].ToString(),
-                    RelatedTableName = r["RelatedTableName"].ToString()
+                    RelatedTableName = r["RelatedTableName"].ToString(),
+                    DataType = r["DataType"].ToString()
                 }).ToList();
 
         }
@@ -128,27 +133,28 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp.Engines
 
         public string MapDataType(string dbType)
         {
-            return dbType switch {
-                "int"=> "int",
+            return dbType switch
+            {
+                "int" => "int",
                 "bigint" => "long",
-                "nvarchar"=>"string",
+                "nvarchar" => "string",
                 "ntext" => "string",
                 "bit" => "bool",
-                "datetimeoffset"=> "DateTime",
-                "datetime"=>"DateTime",
+                "datetimeoffset" => "DateTime",
+                "datetime" => "DateTime",
                 "datetime2" => "DateTime",
-                "decimal"=> "decimal",
-                "uniqueidentifier"=>"Guid",
-                _=> "string"
+                "decimal" => "decimal",
+                "uniqueidentifier" => "Guid",
+                _ => "string"
 
             };
         }
 
         public string MapTableName(string dbTableName)
         {
-            return dbTableName.EndsWith("ies")?
-                dbTableName.Replace("ies","y") : dbTableName.EndsWith("ses")?
-                dbTableName.Replace("ses","s") : dbTableName.TrimEnd('s');
+            return dbTableName.EndsWith("ies") ?
+                dbTableName.Replace("ies", "y") : dbTableName.EndsWith("ses") ?
+                dbTableName.Replace("ses", "s") : dbTableName.TrimEnd('s');
         }
     }
 }

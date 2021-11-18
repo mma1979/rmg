@@ -1,12 +1,14 @@
-﻿using MMA.Tools.RichModelGenerator.DesktopApp.Engines;
-using MMA.Tools.RichModelGenerator.DesktopApp.Forms;
-using MMA.Tools.RichModelGenerator.DesktopApp.Models;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+
+using MMA.Tools.RichModelGenerator.DesktopApp.Engines;
+using MMA.Tools.RichModelGenerator.DesktopApp.Forms;
+using MMA.Tools.RichModelGenerator.DesktopApp.Models;
+
+using Newtonsoft.Json;
 
 namespace MMA.Tools.RichModelGenerator.DesktopApp
 {
@@ -58,7 +60,7 @@ namespace MMA.Tools.RichModelGenerator.DesktopApp
                 Name = tableName,
                 IdType = idType,
                 Columns = new List<Column>(),
-                TableRelations=new List<TableRelation>()
+                TableRelations = new List<TableRelation>()
             });
 
             var columns = Screen.PrimaryScreen.WorkingArea.Width / 300;
